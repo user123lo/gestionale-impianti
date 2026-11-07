@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gestionale Impianti – Prototipo</title>
+<style>
+:root{
+  --blu:#1670c2; --blu-scuro:#0f4f8a; --blu-chiaro:#e8f2fb;
+  --testo:#1d2733; --grigio:#6b7785; --bordo:#d9e1ea; --sfondo:#f4f7fa;
+  --verde:#1f8a4c; --rosso:#c23b3b; --arancio:#c27a16;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;color:var(--testo);background:var(--sfondo);font-size:14px}
+button,input,select,textarea{font:inherit}
+header{background:var(--blu);color:#fff;display:flex;align-items:center;gap:24px;padding:0 20px;height:56px;position:sticky;top:0;z-index:5}
+header .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;white-space:nowrap}
+header nav{display:flex;gap:4px;flex-wrap:wrap}
+header nav button{background:transparent;border:0;color:#d8e8f7;padding:8px 14px;border-radius:6px;cursor:pointer}
+header nav button:hover{background:rgba(255,255,255,.12);color:#fff}
+header nav button.attivo{background:#fff;color:var(--blu-scuro);font-weight:600}
+header .salvato{margin-left:auto;font-size:12px;color:#cfe3f6;white-space:nowrap}
+main{max-width:1200px;margin:0 auto;padding:22px 20px 60px}
+h1{font-size:22px;margin:0 0 4px}
+h2{font-size:16px;margin:0 0 12px}
+.sottotitolo{color:var(--grigio);margin:0 0 18px}
+.riga{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.spazio{flex:1}
+.btn{border:1px solid var(--blu);background:var(--blu);color:#fff;padding:8px 14px;border-radius:6px;cursor:pointer;font-weight:600}
+.btn:hover{background:var(--blu-scuro)}
+.btn.sec{background:#fff;color:var(--blu)}
+.btn.sec:hover{background:var(--blu-chiaro)}
+.btn.rosso{background:#fff;color:var(--rosso);border-color:var(--rosso)}
+.btn.rosso:hover{background:#fbeaea}
+.btn.piccolo{padding:4px 10px;font-weight:500;font-size:13px}
+.card{background:#fff;border:1px solid var(--bordo);border-radius:10px;padding:18px}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:18px}
+.kpi .card .num{font-size:26px;font-weight:700;margin-top:4px}
+.kpi .card .lab{color:var(--grigio);font-size:13px}
+.griglia2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:860px){.griglia2{grid-template-columns:1fr}}
+input[type=text],input[type=email],input[type=tel],input[type=date],input[type=number],input[type=search],select,textarea{
+  width:100%;border:1px solid var(--bordo);border-radius:6px;padding:7px 9px;background:#fff;color:var(--testo)}
+input:focus,select:focus,textarea:focus{outline:2px solid #9cc6ee;border-color:var(--blu)}
+textarea{min-height:70px;resize:vertical}
+.cerca{max-width:360px}
+table{width:100%;border-collapse:collapse;background:#fff}
+th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--grigio);padding:10px;border-bottom:2px solid var(--bordo);background:#fafcfe}
+td{padding:10px;border-bottom:1px solid var(--bordo);vertical-align:top}
+tbody tr.clic{cursor:pointer}
+tbody tr.clic:hover{background:var(--blu-chiaro)}
+.tab-wrap{overflow-x:auto;border:1px solid var(--bordo);border-radius:10px}
+.vuoto{color:var(--grigio);text-align:center;padding:30px}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600}
+.b-verde{background:#e3f4ea;color:var(--verde)}
+.b-rosso{background:#fbe6e6;color:var(--rosso)}
+.b-arancio{background:#fcf0dc;color:var(--arancio)}
+.b-blu{background:var(--blu-chiaro);color:var(--blu-scuro)}
+.schede{display:flex;gap:2px;border-bottom:2px solid var(--bordo);margin:16px 0 0;flex-wrap:wrap}
+.schede button{border:0;background:transparent;padding:10px 16px;cursor:pointer;color:var(--grigio);border-bottom:3px solid transparent;margin-bottom:-2px;font-weight:600}
+.schede button.attivo{color:var(--blu);border-bottom-color:var(--blu)}
+.pannello{background:#fff;border:1px solid var(--bordo);border-top:0;border-radius:0 0 10px 10px;padding:18px}
+fieldset{border:1px solid var(--bordo);border-radius:8px;padding:12px 14px 14px;margin:0 0 14px}
+legend{color:var(--blu);font-weight:700;font-size:13px;padding:0 6px}
+.campi{display:grid;grid-template-columns:repeat(12,1fr);gap:10px 12px}
+.campi label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--grigio);font-weight:600}
+.c2{grid-column:span 2}.c3{grid-column:span 3}.c4{grid-column:span 4}.c6{grid-column:span 6}.c8{grid-column:span 8}.c12{grid-column:span 12}
+@media(max-width:700px){.c2,.c3,.c4,.c6,.c8{grid-column:span 12}}
+.intesta{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.avatar{width:52px;height:52px;border-radius:12px;background:var(--blu-chiaro);color:var(--blu);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px}
+.indietro{background:none;border:0;color:var(--blu);cursor:pointer;padding:0;margin-bottom:10px;font-weight:600}
+.lavoro{border:1px solid var(--bordo);border-radius:8px;padding:12px 14px;margin-bottom:10px;display:grid;grid-template-columns:110px 1fr auto;gap:12px}
+.lavoro .data{font-weight:700;color:var(--blu-scuro)}
+.lavoro .tipo{font-weight:700}
+.lavoro .desc{color:#3b4754;margin-top:3px;white-space:pre-wrap}
+.lavoro .meta{color:var(--grigio);font-size:12px;margin-top:4px}
+.lavoro .soldi{text-align:right;white-space:nowrap}
+@media(max-width:700px){.lavoro{grid-template-columns:1fr}.lavoro .soldi{text-align:left}}
+.totali{display:flex;gap:18px;flex-wrap:wrap;margin:6px 0 14px;color:var(--grigio)}
+.totali b{color:var(--testo)}
+.avviso{background:#fff8e6;border:1px solid #f0d79a;color:#7a5a12;border-radius:8px;padding:10px 14px;margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.info{background:var(--blu-chiaro);border:1px solid #c5ddf3;color:var(--blu-scuro);border-radius:8px;padding:12px 14px;margin-bottom:14px}
+.modale-fondo{position:fixed;inset:0;background:rgba(15,30,45,.45);display:none;align-items:center;justify-content:center;z-index:20;padding:16px}
+.modale-fondo.aperto{display:flex}
+.modale{background:#fff;border-radius:12px;max-width:640px;width:100%;max-height:90vh;overflow:auto;padding:20px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1d2733;color:#fff;padding:10px 18px;border-radius:8px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:30}
+.toast.vis{opacity:1}
+.lista-mini{list-style:none;margin:0;padding:0}
+.lista-mini li{padding:8px 0;border-bottom:1px solid var(--bordo);display:flex;justify-content:space-between;gap:10px}
+.lista-mini li:last-child{border-bottom:0}
+.link{color:var(--blu);cursor:pointer;font-weight:600}
+.nascosto{display:none!important}
+@media print{
+  header,.no-stampa,.schede,.indietro{display:none!important}
+  body{background:#fff}
+  .pannello,.card{border:0;padding:0}
+  .stampa-tutto .pannello-tab{display:block!important;margin-bottom:20px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M3 11 12 3l9 8v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" fill="#fff"/><path d="M12 9c1.8 2.3 2.8 3.9 2.8 5.2a2.8 2.8 0 0 1-5.6 0C9.2 12.9 10.2 11.3 12 9z" fill="#1670c2"/></svg>
+    Gestionale Impianti
+  </div>
+  <nav>
+    <button data-vista="home">Home</button>
+    <button data-vista="clienti">Clienti</button>
+    <button data-vista="lavori">Lavori</button>
+    <button data-vista="dati">I miei dati</button>
+  </nav>
+  <div class="salvato" id="statoSalvataggio"></div>
+</header>
+
+<main id="app"></main>
+
+<div class="modale-fondo" id="modaleFondo"><div class="modale" id="modale"></div></div>
+<div class="toast" id="toast"></div>
+<input type="file" id="fileImport" accept=".json,application/json" class="nascosto">
+
+<script>
+/* =========================================================
+   DATI
+   Tutti i dati stanno in un unico oggetto: { clienti:[...], ultimoBackup }
+   Vengono salvati nel browser di questo computer e si possono
+   esportare in un file .json che resta al cliente.
+   ========================================================= */
+const CHIAVE = "gestionale_impianti_v1";
+let memoria = true;
+let db = carica();
+
+function carica(){
+  try{
+    const s = localStorage.getItem(CHIAVE);
+    if(s) return JSON.parse(s);
+  }catch(e){ memoria = false; }
+  return datiDemo();
+}
+function salva(){
+  try{ localStorage.setItem(CHIAVE, JSON.stringify(db)); memoria = true; }
+  catch(e){ memoria = false; }
+  aggiornaStato();
+}
+function aggiornaStato(){
+  const el = document.getElementById("statoSalvataggio");
+  el.textContent = memoria ? "✓ Dati salvati su questo computer" : "⚠ Salvataggio non disponibile: esporta un backup";
+}
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function oggi(){ return new Date().toISOString().slice(0,10); }
+function aggiungiGiorni(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x.toISOString().slice(0,10); }
+
+function datiDemo(){
+  const t = oggi();
+  const c = (o)=>Object.assign({
+    id:uid(), codice:"", ragione:"", cognome:"", nome:"", descrizione:"Privato",
+    sede:{indirizzo:"",localita:"",prov:"",cap:"",piano:"",interno:"",scala:""},
+    residenza:{indirizzo:"",localita:"",prov:"",cap:""},
+    cf:"", piva:"", tel:"", mobile1:"", mobile2:"", email:"", pec:"", sdi:"", note:"",
+    impianto:{codCatasto:"",matricola:"",contratto:"",inizio:"",fine:"",condizioni:"",tipo:"Caldaia",modello:"",fabbricante:"",combustibile:"",tipoCamera:"",acqua:"",potNominale:"",potUtile:"",rendimento:"",potAssorbita:"",tempRisc:"",effEnergetica:"",termostato:"",valvole:"",evacuazione:"",progettista:"",installatore:"",dataInstallazione:"",note:""},
+    lavori:[]
+  }, o);
+  return {
+    ultimoBackup:null,
+    clienti:[
+      c({codice:"C001", cognome:"Rossi", nome:"Mario", descrizione:"Condominio",
+        sede:{indirizzo:"Via Tuscolana 1050",localita:"Roma",prov:"RM",cap:"00173",piano:"T",interno:"",scala:"A"},
+        tel:"06 1234567", mobile1:"333 1112233", email:"mario.rossi@esempio.it",
+        impianto:Object.assign(c({}).impianto,{codCatasto:"A1",matricola:"WED34ER",contratto:"N°1",inizio:"2026-01-23",fine:aggiungiGiorni(t,18),condizioni:"Manutenzione annuale",tipo:"Pompa di calore",modello:"Ecodan Hydrobox Duo",fabbricante:"Samsung",installatore:"Impianti Termici",dataInstallazione:"2023-01-23"}),
+        lavori:[
+          {id:uid(),data:"2026-10-28",tipo:"Manutenzione ordinaria",descrizione:"Pulizia filtri, controllo pressione circuito, verifica parametri.",tecnico:"Paolo",ore:"2",costo:"120",pagato:"120"},
+          {id:uid(),data:"2026-03-12",tipo:"Riparazione",descrizione:"Sostituzione sonda temperatura esterna.",tecnico:"Stefano",ore:"1.5",costo:"180",pagato:"100"},
+          {id:uid(),data:"2023-01-23",tipo:"Installazione",descrizione:"Installazione pompa di calore e collaudo.",tecnico:"Paolo",ore:"8",costo:"4800",pagato:"4800"}
+        ]}),
+      c({codice:"C002", cognome:"Ferri", nome:"Giulia",
+        sede:{indirizzo:"Via dei Gelsi 14",localita:"Roma",prov:"RM",cap:"00179",piano:"3",interno:"8",scala:""},
+        mobile1:"340 0000001",
+        impianto:Object.assign(c({}).impianto,{matricola:"VX-88231",contratto:"N°7",inizio:"2025-11-01",fine:aggiungiGiorni(t,-5),tipo:"Caldaia",modello:"ecoTEC plus",fabbricante:"Vaillant",combustibile:"Metano",tipoCamera:"Stagna",dataInstallazione:"2019-05-10"}),
+        lavori:[
+          {id:uid(),data:"2025-11-04",tipo:"Analisi fumi",descrizione:"Analisi combustione e compilazione libretto.",tecnico:"Andrea",ore:"1",costo:"90",pagato:"90"}
+        ]}),
+      c({codice:"C003", cognome:"Conti", nome:"Luca", descrizione:"Privato",
+        sede:{indirizzo:"Via delle Robinie 8",localita:"Roma",prov:"RM",cap:"00176",piano:"1",interno:"2",scala:""},
+        mobile1:"340 0000002",
+        impianto:Object.assign(c({}).impianto,{tipo:"Solare termico",fabbricante:"Riello",modello:"CSAL 2.5",contratto:"N°12",inizio:"2026-04-01",fine:"2027-04-01",dataInstallazione:"2024-06-15"}),
+        lavori:[
+          {id:uid(),data:"2026-09-02",tipo:"Manutenzione ordinaria",descrizione:"Controllo glicole e pressione pannelli.",tecnico:"Paolo",ore:"1.5",costo:"110",pagato:"0"},
+          {id:uid(),data:"2024-06-15",tipo:"Installazione",descrizione:"Installazione impianto solare termico 2 pannelli.",tecnico:"Paolo",ore:"10",costo:"3900",pagato:"3900"}
+        ]}),
+      c({codice:"C004", ragione:"Condominio Via Latina 45", descrizione:"Condominio",
+        sede:{indirizzo:"Via Latina 45",localita:"Roma",prov:"RM",cap:"00179",piano:"",interno:"",scala:""},
+        tel:"06 7654321", email:"amministrazione@esempio.it", piva:"01234567890",
+        impianto:Object.assign(c({}).impianto,{tipo:"Caldaia",fabbricante:"Baxi",modello:"Power HT+ 1.1000",combustibile:"Metano",potNominale:"100",contratto:"N°3",inizio:"2025-10-15",fine:aggiungiGiorni(t,40),dataInstallazione:"2018-09-01"}),
+        lavori:[
+          {id:uid(),data:"2026-10-15",tipo:"Prima accensione",descrizione:"Prima accensione stagione e verifica centrale termica.",tecnico:"Stefano",ore:"3",costo:"250",pagato:"0"}
+        ]})
+    ]
+  };
+}
+
+/* ========================================================= UTILITÀ */
+const $ = (s,r=document)=>r.querySelector(s);
+const esc = s => String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const euro = n => (Number(n)||0).toLocaleString("it-IT",{style:"currency",currency:"EUR"});
+const dataIt = d => d ? new Date(d+"T00:00").toLocaleDateString("it-IT") : "—";
+const nomeCliente = c => c.ragione || [c.cognome,c.nome].filter(Boolean).join(" ") || "(senza nome)";
+const iniziali = c => (nomeCliente(c).split(" ").map(p=>p[0]).join("").slice(0,2)||"?").toUpperCase();
+const ultimoLavoro = c => c.lavori.slice().sort((a,b)=>b.data.localeCompare(a.data))[0];
+const daPagare = l => Math.max(0,(Number(l.costo)||0)-(Number(l.pagato)||0));
+const TIPI_LAVORO = ["Manutenzione ordinaria","Manutenzione straordinaria","Riparazione","Installazione","Prima accensione","Analisi fumi","Sopralluogo","Sostituzione componente","Altro"];
+const TIPI_IMPIANTO = ["Caldaia","Pompa di calore","Condizionatore","Solare termico","Fotovoltaico","Scaldabagno","Impianto idraulico","Altro"];
+
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("vis"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("vis"),2200); }
+function apriModale(html){ $("#modale").innerHTML=html; $("#modaleFondo").classList.add("aperto"); }
+function chiudiModale(){ $("#modaleFondo").classList.remove("aperto"); }
+$("#modaleFondo").addEventListener("click",e=>{ if(e.target.id==="modaleFondo") chiudiModale(); });
+function conferma(testo, onSi){
+  apriModale(`<h2>Conferma</h2><p>${esc(testo)}</p>
+    <div class="riga" style="justify-content:flex-end;margin-top:16px">
+      <button class="btn sec" id="mNo">Annulla</button><button class="btn rosso" id="mSi">Elimina</button></div>`);
+  $("#mNo").onclick=chiudiModale; $("#mSi").onclick=()=>{chiudiModale(); onSi();};
+}
+function giorniBackup(){ if(!db.ultimoBackup) return null; return Math.floor((Date.now()-new Date(db.ultimoBackup))/86400000); }
+
+/* ========================================================= NAVIGAZIONE */
+let vista = {nome:"home"};
+let schedaAttiva = "anagrafica";
+function vai(nome, extra={}){ vista = Object.assign({nome}, extra); render(); window.scrollTo(0,0); }
+document.querySelectorAll("header nav button").forEach(b=>b.onclick=()=>vai(b.dataset.vista));
+
+function render(){
+  document.querySelectorAll("header nav button").forEach(b=>b.classList.toggle("attivo", b.dataset.vista===vista.nome || (vista.nome==="scheda"&&b.dataset.vista==="clienti")));
+  const app = $("#app");
+  if(vista.nome==="home") app.innerHTML = vHome();
+  else if(vista.nome==="clienti") app.innerHTML = vClienti();
+  else if(vista.nome==="scheda") app.innerHTML = vScheda();
+  else if(vista.nome==="lavori") app.innerHTML = vLavori();
+  else if(vista.nome==="dati") app.innerHTML = vDati();
+  collega();
+  aggiornaStato();
+}
+
+function bannerBackup(){
+  const g = giorniBackup();
+  if(g!==null && g<7) return "";
+  const testo = g===null ? "Non hai ancora fatto nessun backup dei dati." : `L'ultimo backup è di ${g} giorni fa.`;
+  return `<div class="avviso no-stampa">⚠ ${testo} <span class="spazio"></span><button class="btn piccolo" data-az="backup">Scarica backup ora</button></div>`;
+}
+
+/* ========================================================= HOME */
+function vHome(){
+  const anno = new Date().getFullYear().toString();
+  const tutti = db.clienti.flatMap(c=>c.lavori.map(l=>({...l,cliente:c})));
+  const lavAnno = tutti.filter(l=>l.data.startsWith(anno));
+  const fatt = lavAnno.reduce((s,l)=>s+(Number(l.costo)||0),0);
+  const insoluti = tutti.filter(l=>daPagare(l)>0);
+  const totIns = insoluti.reduce((s,l)=>s+daPagare(l),0);
+  const t = oggi(), lim = aggiungiGiorni(t,60);
+  const scad = db.clienti.filter(c=>c.impianto.fine && c.impianto.fine<=lim).sort((a,b)=>a.impianto.fine.localeCompare(b.impianto.fine));
+  const recenti = tutti.sort((a,b)=>b.data.localeCompare(a.data)).slice(0,6);
+  return `${bannerBackup()}
+  <h1>Buongiorno</h1><p class="sottotitolo">Situazione aggiornata al ${dataIt(t)}</p>
+  <div class="kpi">
+    <div class="card"><div class="lab">Clienti</div><div class="num">${db.clienti.length}</div></div>
+    <div class="card"><div class="lab">Lavori nel ${anno}</div><div class="num">${lavAnno.length}</div></div>
+    <div class="card"><div class="lab">Fatturato lavori ${anno}</div><div class="num">${euro(fatt)}</div></div>
+    <div class="card"><div class="lab">Da incassare</div><div class="num" style="color:${totIns?'var(--rosso)':'inherit'}">${euro(totIns)}</div></div>
+  </div>
+  <div class="griglia2">
+    <div class="card"><h2>Contratti scaduti o in scadenza (60 giorni)</h2>
+      ${scad.length? `<ul class="lista-mini">${scad.map(c=>{
+        const scaduto = c.impianto.fine < t;
+        return `<li><span class="link" data-apri="${c.id}">${esc(nomeCliente(c))}</span>
+          <span>${dataIt(c.impianto.fine)} <span class="badge ${scaduto?'b-rosso':'b-arancio'}">${scaduto?'scaduto':'in scadenza'}</span></span></li>`}).join("")}</ul>`
+        : `<p class="vuoto">Nessun contratto in scadenza</p>`}
+    </div>
+    <div class="card"><h2>Ultimi lavori eseguiti</h2>
+      ${recenti.length? `<ul class="lista-mini">${recenti.map(l=>`<li><span><span class="link" data-apri="${l.cliente.id}" data-tab="lavori">${esc(nomeCliente(l.cliente))}</span><br><small style="color:var(--grigio)">${esc(l.tipo)}</small></span><span>${dataIt(l.data)}</span></li>`).join("")}</ul>`
+        : `<p class="vuoto">Nessun lavoro registrato</p>`}
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px"><h2>Da incassare</h2>
+    ${insoluti.length? `<ul class="lista-mini">${insoluti.map(l=>`<li><span><span class="link" data-apri="${l.cliente.id}" data-tab="lavori">${esc(nomeCliente(l.cliente))}</span> · ${esc(l.tipo)} del ${dataIt(l.data)}</span><b style="color:var(--rosso)">${euro(daPagare(l))}</b></li>`).join("")}</ul>`
+      : `<p class="vuoto">Tutto incassato</p>`}
+  </div>`;
+}
+
+/* ========================================================= LISTA CLIENTI */
+let filtroClienti = "";
+function vClienti(){
+  return `${bannerBackup()}
+  <div class="riga" style="margin-bottom:14px">
+    <div><h1>Clienti</h1><p class="sottotitolo" style="margin:0">${db.clienti.length} clienti in archivio</p></div>
+    <span class="spazio"></span>
+    <button class="btn" data-az="nuovoCliente">+ Nuovo cliente</button>
+  </div>
+  <div class="riga" style="margin-bottom:12px">
+    <input type="search" class="cerca" id="cercaClienti" placeholder="Cerca per nome, indirizzo, telefono, matricola…" value="${esc(filtroClienti)}">
+  </div>
+  <div class="tab-wrap"><table>
+    <thead><tr><th>Codice</th><th>Cliente</th><th>Indirizzo</th><th>Telefono</th><th>Impianto</th><th>Ultimo intervento</th><th>Contratto</th></tr></thead>
+    <tbody id="corpoClienti">${righeClienti()}</tbody>
+  </table></div>`;
+}
+function righeClienti(){
+  const q = filtroClienti.trim().toLowerCase();
+  const t = oggi();
+  const lista = db.clienti.filter(c=>{
+    if(!q) return true;
+    const testo = [c.codice,nomeCliente(c),c.sede.indirizzo,c.sede.localita,c.tel,c.mobile1,c.mobile2,c.email,c.cf,c.piva,c.impianto.matricola,c.impianto.modello,c.impianto.fabbricante].join(" ").toLowerCase();
+    return testo.includes(q);
+  }).sort((a,b)=>nomeCliente(a).localeCompare(nomeCliente(b)));
+  if(!lista.length) return `<tr><td colspan="7" class="vuoto">Nessun cliente trovato</td></tr>`;
+  return lista.map(c=>{
+    const u = ultimoLavoro(c);
+    let stato = `<span class="badge b-blu">—</span>`;
+    if(c.impianto.fine){
+      if(c.impianto.fine<t) stato=`<span class="badge b-rosso">Scaduto</span>`;
+      else if(c.impianto.fine<=aggiungiGiorni(t,60)) stato=`<span class="badge b-arancio">In scadenza</span>`;
+      else stato=`<span class="badge b-verde">Attivo</span>`;
+    }
+    return `<tr class="clic" data-apri="${c.id}">
+      <td>${esc(c.codice)}</td>
+      <td><b>${esc(nomeCliente(c))}</b><br><small style="color:var(--grigio)">${esc(c.descrizione)}</small></td>
+      <td>${esc(c.sede.indirizzo)}<br><small style="color:var(--grigio)">${esc([c.sede.cap,c.sede.localita,c.sede.prov].filter(Boolean).join(" "))}</small></td>
+      <td>${esc(c.mobile1||c.tel)}</td>
+      <td>${esc(c.impianto.tipo)}<br><small style="color:var(--grigio)">${esc([c.impianto.fabbricante,c.impianto.modello].filter(Boolean).join(" "))}</small></td>
+      <td>${u?`${dataIt(u.data)}<br><small style="color:var(--grigio)">${esc(u.tipo)}</small>`:"—"}</td>
+      <td>${stato}</td></tr>`;
+  }).join("");
+}
+
+/* ========================================================= SCHEDA CLIENTE */
+function campo(etichetta, percorso, classe="c4", tipo="text", opzioni=null){
+  const v = leggi(vista.bozza, percorso) ?? "";
+  if(opzioni) return `<label class="${classe}">${etichetta}<select data-campo="${percorso}">${opzioni.map(o=>`<option ${o===v?"selected":""}>${esc(o)}</option>`).join("")}</select></label>`;
+  if(tipo==="area") return `<label class="${classe}">${etichetta}<textarea data-campo="${percorso}">${esc(v)}</textarea></label>`;
+  return `<label class="${classe}">${etichetta}<input type="${tipo}" data-campo="${percorso}" value="${esc(v)}"></label>`;
+}
+function leggi(o,p){ return p.split(".").reduce((a,k)=>a?.[k],o); }
+function scrivi(o,p,v){ const k=p.split("."); const u=k.pop(); k.reduce((a,x)=>a[x],o)[u]=v; }
+
+function vScheda(){
+  const c = vista.bozza;
+  const nuovo = !db.clienti.some(x=>x.id===c.id);
+  const totCosto = c.lavori.reduce((s,l)=>s+(Number(l.costo)||0),0);
+  const totPagato = c.lavori.reduce((s,l)=>s+(Number(l.pagato)||0),0);
+  const tab = (id,txt)=>`<button data-tabsel="${id}" class="${schedaAttiva===id?'attivo':''}">${txt}</button>`;
+  return `<button class="indietro" data-az="tornaLista">← Torna alla lista clienti</button>
+  <div class="card">
+    <div class="intesta">
+      <div class="avatar">${esc(iniziali(c))}</div>
+      <div><h1>${esc(nuovo && !nomeCliente(c).trim() ? "Nuovo cliente" : nomeCliente(c))}</h1>
+        <p class="sottotitolo" style="margin:0">${esc(c.codice||"senza codice")} · ${esc(c.descrizione)} · ${c.lavori.length} lavori registrati</p></div>
+      <span class="spazio"></span>
+      <div class="riga no-stampa">
+        ${nuovo?"":`<button class="btn rosso" data-az="eliminaCliente">Elimina</button>`}
+        <button class="btn sec" data-az="stampa">Stampa scheda</button>
+        <button class="btn" data-az="salvaCliente">Salva</button>
+      </div>
+    </div>
+  </div>
+  <div class="schede">${tab("anagrafica","Dati anagrafici")}${tab("impianto","Impianto")}${tab("lavori",`Lavori eseguiti (${c.lavori.length})`)}</div>
+  <div class="pannello" id="pannelloScheda">
+
+  <div class="pannello-tab ${schedaAttiva==='anagrafica'?'':'nascosto'}">
+    <fieldset><legend>Cliente</legend><div class="campi">
+      ${campo("Codice","codice","c2")}${campo("Cognome","cognome","c3")}${campo("Nome","nome","c3")}
+      ${campo("Tipo cliente","descrizione","c4","text",["Privato","Condominio","Azienda","Ente pubblico"])}
+      ${campo("Ragione sociale (se azienda/condominio)","ragione","c12")}
+    </div></fieldset>
+    <fieldset><legend>Sede impianto</legend><div class="campi">
+      ${campo("Indirizzo","sede.indirizzo","c6")}${campo("Località","sede.localita","c4")}${campo("Prov.","sede.prov","c2")}
+      ${campo("C.A.P.","sede.cap","c3")}${campo("Piano","sede.piano","c3")}${campo("Interno","sede.interno","c3")}${campo("Scala","sede.scala","c3")}
+    </div></fieldset>
+    <fieldset><legend>Residenza (se diversa)</legend><div class="campi">
+      ${campo("Indirizzo","residenza.indirizzo","c6")}${campo("Località","residenza.localita","c3")}${campo("Prov.","residenza.prov","c1 c2")}${campo("C.A.P.","residenza.cap","c1 c2")}
+    </div></fieldset>
+    <fieldset><legend>Contatti e dati fiscali</legend><div class="campi">
+      ${campo("Codice fiscale","cf","c4")}${campo("Partita IVA","piva","c4")}${campo("Codice SDI","sdi","c4")}
+      ${campo("Telefono","tel","c4","tel")}${campo("Cellulare 1","mobile1","c4","tel")}${campo("Cellulare 2","mobile2","c4","tel")}
+      ${campo("E-mail","email","c6","email")}${campo("PEC","pec","c6","email")}
+      ${campo("Note","note","c12","area")}
+    </div></fieldset>
+  </div>
+
+  <div class="pannello-tab ${schedaAttiva==='impianto'?'':'nascosto'}">
+    <fieldset><legend>Contratto</legend><div class="campi">
+      ${campo("N° contratto","impianto.contratto","c3")}${campo("Inizio","impianto.inizio","c3","date")}${campo("Fine / scadenza","impianto.fine","c3","date")}${campo("Cod. catasto","impianto.codCatasto","c3")}
+      ${campo("Condizioni","impianto.condizioni","c12")}
+    </div></fieldset>
+    <fieldset><legend>Dati impianto</legend><div class="campi">
+      ${campo("Tipo impianto","impianto.tipo","c4","text",TIPI_IMPIANTO)}${campo("Fabbricante","impianto.fabbricante","c4")}${campo("Modello","impianto.modello","c4")}
+      ${campo("Matricola","impianto.matricola","c4")}${campo("Combustibile","impianto.combustibile","c4")}${campo("Tipo camera","impianto.tipoCamera","c4")}
+      ${campo("Potenza termica nominale (kW)","impianto.potNominale","c4")}${campo("Potenza termica utile (kW)","impianto.potUtile","c4")}${campo("Potenza elettrica assorbita (kW)","impianto.potAssorbita","c4")}
+      ${campo("Rendimento termico (%)","impianto.rendimento","c3")}${campo("Temp. riscaldamento (°C)","impianto.tempRisc","c3")}${campo("Classe energetica","impianto.effEnergetica","c3")}${campo("Acqua (L/min)","impianto.acqua","c3")}
+      ${campo("Termostato","impianto.termostato","c6")}${campo("Valvole termostatiche","impianto.valvole","c6")}
+      ${campo("Evacuazione / tiraggio","impianto.evacuazione","c12")}
+    </div></fieldset>
+    <fieldset><legend>Installazione</legend><div class="campi">
+      ${campo("Installatore","impianto.installatore","c4")}${campo("Progettista","impianto.progettista","c4")}${campo("Data installazione","impianto.dataInstallazione","c4","date")}
+      ${campo("Note impianto","impianto.note","c12","area")}
+    </div></fieldset>
+  </div>
+
+  <div class="pannello-tab ${schedaAttiva==='lavori'?'':'nascosto'}">
+    <div class="riga no-stampa" style="margin-bottom:10px">
+      <div class="totali">
+        <span>Totale lavori: <b>${euro(totCosto)}</b></span>
+        <span>Pagato: <b>${euro(totPagato)}</b></span>
+        <span>Da pagare: <b style="color:${totCosto-totPagato>0?'var(--rosso)':'inherit'}">${euro(Math.max(0,totCosto-totPagato))}</b></span>
+      </div>
+      <span class="spazio"></span>
+      <button class="btn" data-az="nuovoLavoro">+ Registra lavoro</button>
+    </div>
+    ${c.lavori.length ? c.lavori.slice().sort((a,b)=>b.data.localeCompare(a.data)).map(l=>`
+      <div class="lavoro">
+        <div class="data">${dataIt(l.data)}</div>
+        <div><div class="tipo">${esc(l.tipo)}</div>
+          ${l.descrizione?`<div class="desc">${esc(l.descrizione)}</div>`:""}
+          <div class="meta">${l.tecnico?`Tecnico: ${esc(l.tecnico)}`:""}${l.ore?` · Ore: ${esc(l.ore)}`:""}</div></div>
+        <div class="soldi">${euro(l.costo)}<br>
+          ${daPagare(l)>0?`<span class="badge b-rosso">da pagare ${euro(daPagare(l))}</span>`:`<span class="badge b-verde">pagato</span>`}
+          <div class="riga no-stampa" style="justify-content:flex-end;margin-top:8px">
+            <button class="btn sec piccolo" data-modlav="${l.id}">Modifica</button>
+            <button class="btn rosso piccolo" data-ellav="${l.id}">Elimina</button></div>
+        </div>
+      </div>`).join("") : `<p class="vuoto">Nessun lavoro registrato per questo cliente</p>`}
+  </div>
+  </div>
+  <div class="riga no-stampa" style="justify-content:flex-end;margin-top:14px"><button class="btn" data-az="salvaCliente">Salva</button></div>`;
+}
+
+function formLavoro(l){
+  apriModale(`<h2>${l.id?"Modifica lavoro":"Registra lavoro"}</h2>
+  <form id="fLav"><div class="campi">
+    <label class="c4">Data<input type="date" name="data" value="${esc(l.data||oggi())}" required></label>
+    <label class="c8">Tipo di intervento<select name="tipo">${TIPI_LAVORO.map(t=>`<option ${t===l.tipo?"selected":""}>${t}</option>`).join("")}</select></label>
+    <label class="c12">Descrizione del lavoro<textarea name="descrizione">${esc(l.descrizione)}</textarea></label>
+    <label class="c6">Tecnico<input type="text" name="tecnico" value="${esc(l.tecnico)}"></label>
+    <label class="c6">Ore<input type="number" step="0.5" min="0" name="ore" value="${esc(l.ore)}"></label>
+    <label class="c6">Costo (€)<input type="number" step="0.01" min="0" name="costo" value="${esc(l.costo)}"></label>
+    <label class="c6">Pagato (€)<input type="number" step="0.01" min="0" name="pagato" value="${esc(l.pagato)}"></label>
+  </div>
+  <div class="riga" style="justify-content:flex-end;margin-top:16px">
+    <button type="button" class="btn sec" id="annLav">Annulla</button><button class="btn" type="submit">Salva lavoro</button></div></form>`);
+  $("#annLav").onclick=chiudiModale;
+  $("#fLav").onsubmit=e=>{
+    e.preventDefault();
+    const f=Object.fromEntries(new FormData(e.target));
+    const c=vista.bozza;
+    if(l.id){ Object.assign(c.lavori.find(x=>x.id===l.id), f); }
+    else c.lavori.push(Object.assign({id:uid()},f));
+    chiudiModale(); salvaBozza(true); toast("Lavoro registrato");
+  };
+}
+
+function salvaBozza(silenzioso){
+  const c = vista.bozza;
+  if(!nomeCliente(c).replace("(senza nome)","").trim()){ toast("Inserisci almeno cognome o ragione sociale"); schedaAttiva="anagrafica"; render(); return; }
+  const i = db.clienti.findIndex(x=>x.id===c.id);
+  const copia = JSON.parse(JSON.stringify(c));
+  if(i>=0) db.clienti[i]=copia; else db.clienti.push(copia);
+  salva(); render(); if(!silenzioso) toast("Cliente salvato");
+}
+
+/* ========================================================= TUTTI I LAVORI */
+let filtroLavori = {q:"",anno:"tutti"};
+function vLavori(){
+  const tutti = db.clienti.flatMap(c=>c.lavori.map(l=>({...l,cliente:c})));
+  const anni = [...new Set(tutti.map(l=>l.data.slice(0,4)))].sort().reverse();
+  const q = filtroLavori.q.toLowerCase();
+  const lista = tutti.filter(l=>(filtroLavori.anno==="tutti"||l.data.startsWith(filtroLavori.anno)) &&
+    (!q || [nomeCliente(l.cliente),l.tipo,l.descrizione,l.tecnico].join(" ").toLowerCase().includes(q)))
+    .sort((a,b)=>b.data.localeCompare(a.data));
+  const tot = lista.reduce((s,l)=>s+(Number(l.costo)||0),0);
+  return `${bannerBackup()}<h1>Lavori eseguiti</h1><p class="sottotitolo">Tutti gli interventi di tutti i clienti</p>
+  <div class="riga" style="margin-bottom:12px">
+    <input type="search" class="cerca" id="cercaLavori" placeholder="Cerca cliente, tipo, tecnico…" value="${esc(filtroLavori.q)}">
+    <select id="annoLavori" style="width:auto"><option value="tutti">Tutti gli anni</option>${anni.map(a=>`<option ${a===filtroLavori.anno?"selected":""}>${a}</option>`).join("")}</select>
+    <span class="spazio"></span><span style="color:var(--grigio)">${lista.length} lavori · totale <b style="color:var(--testo)">${euro(tot)}</b></span>
+  </div>
+  <div class="tab-wrap"><table><thead><tr><th>Data</th><th>Cliente</th><th>Intervento</th><th>Tecnico</th><th style="text-align:right">Costo</th><th>Stato</th></tr></thead><tbody>
+  ${lista.length? lista.map(l=>`<tr class="clic" data-apri="${l.cliente.id}" data-tab="lavori">
+    <td>${dataIt(l.data)}</td><td><b>${esc(nomeCliente(l.cliente))}</b></td>
+    <td>${esc(l.tipo)}${l.descrizione?`<br><small style="color:var(--grigio)">${esc(l.descrizione.slice(0,80))}${l.descrizione.length>80?"…":""}</small>`:""}</td>
+    <td>${esc(l.tecnico)}</td><td style="text-align:right">${euro(l.costo)}</td>
+    <td>${daPagare(l)>0?`<span class="badge b-rosso">da pagare</span>`:`<span class="badge b-verde">pagato</span>`}</td></tr>`).join("")
+    : `<tr><td colspan="6" class="vuoto">Nessun lavoro trovato</td></tr>`}
+  </tbody></table></div>`;
+}
+
+/* ========================================================= I MIEI DATI (backup) */
+function vDati(){
+  const g = giorniBackup();
+  const nLav = db.clienti.reduce((s,c)=>s+c.lavori.length,0);
+  return `<h1>I miei dati</h1><p class="sottotitolo">I dati sono tuoi: puoi portarli via quando vuoi, senza chiedere a nessuno.</p>
+  <div class="info">Archivio attuale: <b>${db.clienti.length} clienti</b> e <b>${nLav} lavori</b>.
+   Ultimo backup: <b>${db.ultimoBackup? new Date(db.ultimoBackup).toLocaleString("it-IT") + ` (${g} giorni fa)` : "mai"}</b>.</div>
+  <div class="griglia2">
+    <div class="card"><h2>1 · Backup completo</h2>
+      <p>Scarica un file con <b>tutto l'archivio</b>. Tienilo su una chiavetta, sul disco D o su Google Drive. Con questo file puoi ripristinare tutto, anche su un altro computer.</p>
+      <div class="riga"><button class="btn" data-az="backup">Scarica backup (.json)</button><button class="btn sec" data-az="copiaBackup">Copia negli appunti</button></div></div>
+    <div class="card"><h2>2 · Ripristina da backup</h2>
+      <p>Carica un file di backup scaricato in precedenza. <b>Sostituisce</b> i dati attuali con quelli del file.</p>
+      <button class="btn sec" data-az="importa">Carica file di backup…</button></div>
+    <div class="card"><h2>3 · Esporta per Excel</h2>
+      <p>Due file leggibili con Excel o qualsiasi altro programma: clienti e lavori. Utile per il commercialista o per cambiare software in futuro.</p>
+      <div class="riga"><button class="btn sec" data-az="csvClienti">Clienti (.csv)</button><button class="btn sec" data-az="csvLavori">Lavori (.csv)</button></div></div>
+    <div class="card"><h2>4 · Ricomincia</h2>
+      <p>Cancella i clienti di prova e parti da un archivio vuoto. Prima fai un backup.</p>
+      <div class="riga"><button class="btn rosso" data-az="svuota">Svuota archivio</button><button class="btn sec" data-az="demo">Ricarica dati di prova</button></div></div>
+  </div>`;
+}
+
+function scarica(nome, contenuto, tipo){
+  try{
+    const blob = new Blob([contenuto],{type:tipo});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = nome;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+    return true;
+  }catch(e){ return false; }
+}
+function csv(righe){
+  return "﻿"+righe.map(r=>r.map(v=>{ const s=String(v??""); return /[";\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s; }).join(";")).join("\r\n");
+}
+function backup(){
+  db.ultimoBackup = new Date().toISOString(); salva();
+  scarica(`backup-gestionale-${oggi()}.json`, JSON.stringify(db,null,2), "application/json");
+  toast("Backup scaricato"); render();
+}
+
+/* ========================================================= EVENTI */
+function collega(){
+  document.querySelectorAll("[data-apri]").forEach(el=>el.onclick=e=>{
+    e.stopPropagation();
+    const c = db.clienti.find(x=>x.id===el.dataset.apri);
+    schedaAttiva = el.dataset.tab || "anagrafica";
+    vai("scheda",{bozza:JSON.parse(JSON.stringify(c))});
+  });
+  document.querySelectorAll("[data-tabsel]").forEach(b=>b.onclick=()=>{ schedaAttiva=b.dataset.tabsel; render(); });
+  document.querySelectorAll("[data-campo]").forEach(el=>el.addEventListener("input",()=>scrivi(vista.bozza, el.dataset.campo, el.value)));
+  document.querySelectorAll("[data-modlav]").forEach(b=>b.onclick=()=>formLavoro({...vista.bozza.lavori.find(l=>l.id===b.dataset.modlav)}));
+  document.querySelectorAll("[data-ellav]").forEach(b=>b.onclick=()=>conferma("Eliminare questo lavoro dalla scheda?",()=>{
+    vista.bozza.lavori = vista.bozza.lavori.filter(l=>l.id!==b.dataset.ellav); salvaBozza(true); toast("Lavoro eliminato"); }));
+  const cc = $("#cercaClienti");
+  if(cc) cc.oninput=()=>{ filtroClienti=cc.value; $("#corpoClienti").innerHTML=righeClienti(); collega(); };
+  const cl = $("#cercaLavori");
+  if(cl) cl.oninput=()=>{ filtroLavori.q=cl.value; const p=cl.selectionStart; render(); const n=$("#cercaLavori"); n.focus(); n.setSelectionRange(p,p); };
+  const al = $("#annoLavori");
+  if(al) al.onchange=()=>{ filtroLavori.anno=al.value; render(); };
+
+  document.querySelectorAll("[data-az]").forEach(b=>b.onclick=()=>azione(b.dataset.az));
+}
+
+function azione(a){
+  if(a==="nuovoCliente"){
+    const n = db.clienti.length+1;
+    const base = datiDemo().clienti[0];
+    const vuoto = JSON.parse(JSON.stringify(base));
+    Object.assign(vuoto,{id:uid(),codice:"C"+String(n).padStart(3,"0"),cognome:"",nome:"",ragione:"",descrizione:"Privato",tel:"",mobile1:"",email:"",lavori:[]});
+    for(const k in vuoto.sede) vuoto.sede[k]=""; for(const k in vuoto.impianto) vuoto.impianto[k]=""; vuoto.impianto.tipo="Caldaia";
+    schedaAttiva="anagrafica"; vai("scheda",{bozza:vuoto});
+  }
+  else if(a==="tornaLista") vai("clienti");
+  else if(a==="salvaCliente") salvaBozza();
+  else if(a==="eliminaCliente") conferma(`Eliminare definitivamente ${nomeCliente(vista.bozza)} e tutti i suoi lavori?`,()=>{
+    db.clienti = db.clienti.filter(x=>x.id!==vista.bozza.id); salva(); vai("clienti"); toast("Cliente eliminato"); });
+  else if(a==="nuovoLavoro") formLavoro({tipo:TIPI_LAVORO[0]});
+  else if(a==="stampa"){
+    const p=$("#pannelloScheda"); p.classList.add("stampa-tutto");
+    try{ window.print(); }catch(e){ toast("Stampa non disponibile in questa anteprima"); }
+    p.classList.remove("stampa-tutto");
+  }
+  else if(a==="backup") backup();
+  else if(a==="copiaBackup"){
+    navigator.clipboard.writeText(JSON.stringify(db,null,2)).then(()=>{ db.ultimoBackup=new Date().toISOString(); salva(); render(); toast("Backup copiato: incollalo in un file di testo"); })
+      .catch(()=>toast("Copia non riuscita"));
+  }
+  else if(a==="importa") $("#fileImport").click();
+  else if(a==="csvClienti"){
+    const r=[["Codice","Cliente","Tipo","Indirizzo","CAP","Località","Prov","Telefono","Cellulare","Email","PEC","CF","PIVA","SDI","Impianto","Fabbricante","Modello","Matricola","Contratto","Scadenza","Note"]];
+    db.clienti.forEach(c=>r.push([c.codice,nomeCliente(c),c.descrizione,c.sede.indirizzo,c.sede.cap,c.sede.localita,c.sede.prov,c.tel,c.mobile1,c.email,c.pec,c.cf,c.piva,c.sdi,c.impianto.tipo,c.impianto.fabbricante,c.impianto.modello,c.impianto.matricola,c.impianto.contratto,c.impianto.fine,c.note]));
+    scarica(`clienti-${oggi()}.csv`,csv(r),"text/csv"); toast("File clienti scaricato");
+  }
+  else if(a==="csvLavori"){
+    const r=[["Data","Codice cliente","Cliente","Intervento","Descrizione","Tecnico","Ore","Costo","Pagato","Da pagare"]];
+    db.clienti.forEach(c=>c.lavori.forEach(l=>r.push([l.data,c.codice,nomeCliente(c),l.tipo,l.descrizione,l.tecnico,l.ore,l.costo,l.pagato,daPagare(l)])));
+    scarica(`lavori-${oggi()}.csv`,csv(r),"text/csv"); toast("File lavori scaricato");
+  }
+  else if(a==="svuota") conferma("Svuotare l'archivio? Tutti i clienti e i lavori verranno cancellati da questo computer.",()=>{ db={clienti:[],ultimoBackup:db.ultimoBackup}; salva(); render(); toast("Archivio svuotato"); });
+  else if(a==="demo"){ db=datiDemo(); salva(); render(); toast("Dati di prova caricati"); }
+}
+
+$("#fileImport").addEventListener("change",e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result);
+      if(!Array.isArray(d.clienti)) throw 0;
+      db=d; salva(); vai("clienti"); toast(`Ripristinati ${d.clienti.length} clienti`);
+    }catch(err){ toast("File non valido: non è un backup del gestionale"); }
+    e.target.value="";
+  };
+  r.readAsText(f);
+});
+
+salva();
+render();
+</script>
+</body>
+</html>

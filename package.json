@@ -1,0 +1,13 @@
+{
+  "name": "gestionale-impianti",
+  "version": "2.2.0",
+  "private": true,
+  "description": "Gestionale clienti, impianti e lavori in un unico file HTML: i tuoi dati, sotto il tuo controllo.",
+  "type": "module",
+  "scripts": {
+    "test": "node test/test.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "1.49.1"
+  }
+}
